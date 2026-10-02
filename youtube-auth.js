@@ -2,21 +2,14 @@ const fs = require("fs");
 const path = require("path");
 const { google } = require("googleapis");
 
-const config = process.env.GOOGLE_CLIENT_ID
-  ? {
-      client_id: process.env.GOOGLE_CLIENT_ID,
-      client_secret: process.env.GOOGLE_CLIENT_SECRET
-    }
-  : (() => {
-      const credentials = JSON.parse(
-        fs.readFileSync(
-          path.join(__dirname, "youtube-client-secret.json"),
-          "utf8"
-        )
-      );
+const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 
-      return credentials.web || credentials.installed;
-    })();
+if (!CLIENT_ID || !CLIENT_SECRET) {
+  throw new Error(
+    "GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET environment variables are required."
+  );
+}
 
 const REDIRECT_URI =
   process.env.GOOGLE_REDIRECT_URI ||
@@ -30,8 +23,8 @@ if (!fs.existsSync(TOKEN_DIR)) {
 
 function createOAuthClient() {
   return new google.auth.OAuth2(
-    config.client_id,
-    config.client_secret,
+    CLIENT_ID,
+    CLIENT_SECRET,
     REDIRECT_URI
   );
 }
