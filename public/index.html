@@ -1,259 +1,532 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>DhruvTube</title>
-<link rel="stylesheet" href="/style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+  <meta name="theme-color" content="#09090f">
+  <title>DhruvTube Studio</title>
+  <link rel="stylesheet" href="/style.css?v=studio1">
 </head>
+
 <body>
 
-<header class="topbar">
-  <div class="brand">
-    <div class="yt-icon">▶</div>
-    <b>DhruvTube</b>
-  </div>
+<div class="studio-app">
 
-  <div class="top-actions">
-    <button id="searchOpen">⌕</button>
-    <button id="themeBtn">☾</button>
-    <button id="profileBtn" class="avatar">D</button>
-  </div>
-</header>
+  <!-- TOP BAR -->
+  <header class="studio-topbar">
+    <div class="studio-brand">
+      <div class="studio-logo">▶</div>
+      <div>
+        <strong>DhruvTube</strong>
+        <span>Studio</span>
+      </div>
+    </div>
 
-<div id="searchPanel" class="search-panel">
-  <button id="searchBack">←</button>
-  <input id="searchInput" placeholder="Search DhruvTube">
-  <button id="searchBtn">⌕</button>
+    <div class="top-actions">
+      <button id="refreshBtn" class="icon-btn" aria-label="Refresh">↻</button>
+      <button id="uploadTopBtn" class="upload-btn">＋ Upload</button>
+      <button id="profileBtn" class="studio-avatar">D</button>
+    </div>
+  </header>
+
+  <!-- MOBILE NAV -->
+  <nav class="mobile-nav">
+    <button class="nav-btn active" data-page="dashboard">
+      <span>⌂</span>
+      <small>Dashboard</small>
+    </button>
+
+    <button class="nav-btn" data-page="content">
+      <span>▣</span>
+      <small>Content</small>
+    </button>
+
+    <button class="nav-btn upload-nav" id="mobileUploadBtn">
+      <span>＋</span>
+      <small>Upload</small>
+    </button>
+
+    <button class="nav-btn" data-page="analytics">
+      <span>⌁</span>
+      <small>Analytics</small>
+    </button>
+
+    <button class="nav-btn" data-page="community">
+      <span>♡</span>
+      <small>Community</small>
+    </button>
+  </nav>
+
+  <!-- SIDEBAR -->
+  <aside class="studio-sidebar">
+
+    <div class="side-channel">
+      <div class="channel-avatar">D</div>
+      <div>
+        <strong id="channelName">DhruvTube</strong>
+        <span id="channelHandle">@dhruvtube</span>
+      </div>
+    </div>
+
+    <div class="side-menu">
+
+      <button class="side-item active" data-page="dashboard">
+        <span>⌂</span>
+        Dashboard
+      </button>
+
+      <button class="side-item" data-page="content">
+        <span>▣</span>
+        Content
+      </button>
+
+      <button class="side-item" data-page="analytics">
+        <span>⌁</span>
+        Analytics
+      </button>
+
+      <button class="side-item" data-page="community">
+        <span>♡</span>
+        Community
+      </button>
+
+      <button class="side-item" data-page="earn">
+        <span>◆</span>
+        Earn
+      </button>
+
+    </div>
+
+    <div class="side-bottom">
+      <button class="side-item">
+        <span>⚙</span>
+        Settings
+      </button>
+
+      <button class="side-item">
+        <span>?</span>
+        Help
+      </button>
+    </div>
+
+  </aside>
+
+  <!-- MAIN -->
+  <main class="studio-main">
+
+    <!-- DASHBOARD -->
+    <section id="page-dashboard" class="studio-page active">
+
+      <div class="page-header">
+        <div>
+          <span class="eyebrow">CHANNEL OVERVIEW</span>
+          <h1>Welcome back, <span id="welcomeName">Dhruv</span></h1>
+          <p>Here's what's happening with your channel.</p>
+        </div>
+
+        <button class="primary-btn" id="dashboardUploadBtn">
+          ＋ Upload video
+        </button>
+      </div>
+
+      <!-- CHANNEL CARD -->
+      <section class="gaming-channel-card">
+
+        <div class="channel-glow"></div>
+
+        <div class="gaming-channel-content">
+
+          <div class="large-avatar">D</div>
+
+          <div class="channel-info">
+            <span class="gaming-label">GAMING CREATOR</span>
+            <h2 id="dashboardChannelName">DhruvTube</h2>
+            <p id="dashboardHandle">@dhruvtube</p>
+
+            <div class="channel-stats">
+              <div>
+                <strong id="subscriberCount">0</strong>
+                <span>Subscribers</span>
+              </div>
+
+              <div>
+                <strong id="videoCount">0</strong>
+                <span>Videos</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="gaming-badge">
+            <span>LEVEL</span>
+            <strong>01</strong>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- VIDEO EDITOR -->
+    <section id="page-video-editor" class="studio-page">
+
+      <div class="page-header">
+        <div>
+          <span class="eyebrow">VIDEO MANAGEMENT</span>
+          <h1>Edit video</h1>
+          <p>Manage everything about this video.</p>
+        </div>
+
+        <button class="text-btn" id="editorBackBtn">← Back to content</button>
+      </div>
+
+      <div class="video-editor-layout">
+
+        <div class="editor-preview">
+          <video id="editorVideo" controls playsinline></video>
+        </div>
+
+        <div class="editor-panel">
+
+          <label>Title</label>
+          <input id="editorTitle" class="studio-input">
+
+          <label>Description</label>
+          <textarea id="editorDescription" class="studio-input editor-description"></textarea>
+
+          <div class="editor-info">
+            <div>
+              <span>Views</span>
+              <b id="editorViews">0</b>
+            </div>
+            <div>
+              <span>Video ID</span>
+              <b id="editorVideoId">—</b>
+            </div>
+          </div>
+
+          <div id="editorStatus" class="upload-status"></div>
+
+          <div class="editor-actions">
+            <button class="primary-btn" id="editorSaveBtn">
+              Save changes
+            </button>
+
+            <button class="danger-btn" id="editorDeleteBtn">
+              Delete video
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ANALYTICS -->
+      <div class="section-title">
+        <div>
+          <span class="eyebrow">CHANNEL ANALYTICS</span>
+          <h2>Performance</h2>
+        </div>
+        <button class="text-btn" data-page="analytics">View analytics →</button>
+      </div>
+
+      <div class="analytics-grid">
+
+        <article class="stat-card blue">
+          <div class="stat-icon">◉</div>
+          <span>Views</span>
+          <strong id="totalViews">0</strong>
+          <small>All uploaded videos</small>
+        </article>
+
+        <article class="stat-card purple">
+          <div class="stat-icon">◷</div>
+          <span>Watch time</span>
+          <strong id="watchTime">—</strong>
+          <small>Detailed tracking coming soon</small>
+        </article>
+
+        <article class="stat-card pink">
+          <div class="stat-icon">♥</div>
+          <span>Likes</span>
+          <strong id="totalLikes">0</strong>
+          <small>Across your videos</small>
+        </article>
+
+        <article class="stat-card green">
+          <div class="stat-icon">▣</div>
+          <span>Videos</span>
+          <strong id="totalVideos">0</strong>
+          <small>Published on DhruvTube</small>
+        </article>
+
+      </div>
+
+      <!-- RECENT CONTENT -->
+      <div class="section-title">
+        <div>
+          <span class="eyebrow">CONTENT</span>
+          <h2>Recent videos</h2>
+        </div>
+
+        <button class="text-btn" data-page="content">See all →</button>
+      </div>
+
+      <div id="recentVideos" class="studio-video-list">
+
+        <div class="loading-card">
+          <div class="loader"></div>
+          <span>Loading your videos...</span>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- CONTENT -->
+    <section id="page-content" class="studio-page">
+
+      <div class="page-header">
+        <div>
+          <span class="eyebrow">VIDEO MANAGEMENT</span>
+          <h1>Content</h1>
+          <p>Manage your videos, thumbnails and publishing.</p>
+        </div>
+
+        <button class="primary-btn" id="contentUploadBtn">
+          ＋ Upload video
+        </button>
+      </div>
+
+      <div class="content-tabs">
+        <button class="content-tab active">Videos</button>
+        <button class="content-tab">Shorts</button>
+        <button class="content-tab">Live</button>
+      </div>
+
+      <div id="contentVideos" class="studio-content-grid">
+        <div class="loading-card">
+          <div class="loader"></div>
+          <span>Loading content...</span>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ANALYTICS -->
+    <section id="page-analytics" class="studio-page">
+
+      <div class="page-header">
+        <div>
+          <span class="eyebrow">CHANNEL PERFORMANCE</span>
+          <h1>Analytics</h1>
+          <p>Understand how your channel is performing.</p>
+        </div>
+      </div>
+
+      <div class="analytics-hero">
+
+        <div>
+          <span>Total views</span>
+          <strong id="analyticsViews">0</strong>
+          <small>Based on available video data</small>
+        </div>
+
+        <div class="analytics-chart">
+          <div class="chart-bars">
+            <i style="height:28%"></i>
+            <i style="height:42%"></i>
+            <i style="height:35%"></i>
+            <i style="height:58%"></i>
+            <i style="height:48%"></i>
+            <i style="height:72%"></i>
+            <i style="height:64%"></i>
+            <i style="height:88%"></i>
+            <i style="height:76%"></i>
+            <i style="height:94%"></i>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="analytics-grid analytics-page-grid">
+
+        <article class="stat-card blue">
+          <span>Views</span>
+          <strong id="analyticsViewsCard">0</strong>
+        </article>
+
+        <article class="stat-card pink">
+          <span>Likes</span>
+          <strong id="analyticsLikes">0</strong>
+        </article>
+
+        <article class="stat-card green">
+          <span>Videos</span>
+          <strong id="analyticsVideos">0</strong>
+        </article>
+
+      </div>
+
+      <div class="info-panel">
+        <div class="info-icon">⌁</div>
+        <div>
+          <h3>Advanced analytics</h3>
+          <p>
+            Audience retention, watch time, traffic sources and realtime
+            analytics will be connected as the backend grows.
+          </p>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- COMMUNITY -->
+    <section id="page-community" class="studio-page">
+
+      <div class="page-header">
+        <div>
+          <span class="eyebrow">AUDIENCE</span>
+          <h1>Community</h1>
+          <p>Connect with your viewers and subscribers.</p>
+        </div>
+      </div>
+
+      <div class="community-empty">
+
+        <div class="community-art">
+          ♡
+        </div>
+
+        <h2>Build your community</h2>
+
+        <p>
+          Comments, posts and audience interaction will appear here.
+        </p>
+
+        <span class="coming-badge">COMMUNITY FEATURES</span>
+
+      </div>
+
+    </section>
+
+    <!-- EARN -->
+    <section id="page-earn" class="studio-page">
+
+      <div class="page-header">
+        <div>
+          <span class="eyebrow">CREATOR MONETIZATION</span>
+          <h1>Earn</h1>
+          <p>Manage your creator monetization.</p>
+        </div>
+      </div>
+
+      <div class="earn-card">
+
+        <div class="earn-icon">◆</div>
+
+        <div>
+          <span class="gaming-label">CREATOR PROGRAM</span>
+          <h2>Monetization</h2>
+          <p>
+            Monetization features will become available when the required
+            creator systems are implemented.
+          </p>
+        </div>
+
+      </div>
+
+      <div class="earn-grid">
+
+        <article>
+          <span>Subscribers</span>
+          <strong id="earnSubscribers">0</strong>
+        </article>
+
+        <article>
+          <span>Videos</span>
+          <strong id="earnVideos">0</strong>
+        </article>
+
+        <article>
+          <span>Views</span>
+          <strong id="earnViews">0</strong>
+        </article>
+
+      </div>
+
+    </section>
+
+  </main>
+
 </div>
 
-<nav class="categories">
-  <button class="selected">All</button>
-  <button>Music</button>
-  <button>Gaming</button>
-  <button>Live</button>
-  <button>News</button>
-  <button>Sports</button>
-  <button>Technology</button>
-  <button>Education</button>
-</nav>
+<!-- UPLOAD MODAL -->
+<div id="uploadModal" class="modal hidden">
 
-<main id="home">
+  <div class="modal-backdrop"></div>
 
-  <section class="hero">
-    <div>
-      <span>WELCOME TO</span>
-      <h1>DhruvTube</h1>
-      <p>Watch what you love.</p>
-    </div>
-    <div class="hero-play">▶</div>
-  </section>
+  <div class="upload-modal">
 
-  <section class="section-head">
-    <h2>Recommended</h2>
-    <button>View all</button>
-  </section>
+    <button id="closeUpload" class="modal-close">×</button>
 
-  <div id="videoGrid" class="video-grid"></div>
+    <span class="eyebrow">CREATOR TOOLS</span>
+    <h2>Upload video</h2>
+    <p>Upload a new video to your DhruvTube channel.</p>
 
-</main>
+    <label class="file-drop">
+      <input id="videoFile" type="file" accept="video/*">
+      <span class="file-icon">↑</span>
+      <strong>Select video</strong>
+      <small>MP4, WebM and other supported formats</small>
+    </label>
 
-<section id="shortsPage" class="page hidden">
-  <h2>Shorts</h2>
-  <div id="shortsGrid" class="shorts-grid"></div>
-</section>
+    <input id="uploadTitle" class="studio-input" placeholder="Video title">
+    <textarea id="uploadDescription" class="studio-input" placeholder="Description"></textarea>
 
-<section id="subscriptionsPage" class="page hidden">
-  <h2>Subscriptions</h2>
-  <div class="empty">
-    <div>📺</div>
-    <h3>No subscriptions yet</h3>
-    <p>Subscribe to channels to see their latest videos.</p>
-  </div>
-</section>
+    <button id="startUploadBtn" class="primary-btn full-btn">
+      Upload video
+    </button>
 
-<section id="profilePage" class="page hidden">
-  <div class="you-page">
-
-    <!-- YouTube style top -->
-    <div class="you-top">
-      <button class="you-account">Accounts <span>⌄</span></button>
-
-      <div class="you-top-actions">
-        <span class="you-icon">♧</span>
-        <span class="you-icon">⌕</span>
-        <span class="you-icon">⚙</span>
-      </div>
-    </div>
-
-    <!-- Profile -->
-    <div class="you-profile">
-      <img class="you-big-avatar" id="accountAvatar" src="" alt="Profile">
-
-      <div class="you-profile-info">
-        <div class="you-name">DhruvTube</div>
-        <div class="you-handle">@dhruvtube</div>
-      </div>
-    </div>
-
-    <div class="you-actions">
-      <button class="you-action primary" id="viewChannelBtn">
-        View channel
-      </button>
-
-      <button class="you-action" id="loginBtn">
-        Get Premium
-      </button>
-    </div>
-
-    <!-- History -->
-    <div class="you-section-head">
-      <h2>History</h2>
-      <span>›</span>
-    </div>
-
-    <div class="you-history">
-
-      <div class="you-history-card">
-        <div class="you-thumb">▶</div>
-        <div class="you-video-title">Recently watched video</div>
-        <div class="you-video-channel">DhruvTube</div>
-      </div>
-
-      <div class="you-history-card">
-        <div class="you-thumb">▶</div>
-        <div class="you-video-title">Your watched videos</div>
-        <div class="you-video-channel">DhruvTube</div>
-      </div>
-
-      <div class="you-history-card">
-        <div class="you-thumb">▶</div>
-        <div class="you-video-title">Continue watching</div>
-        <div class="you-video-channel">DhruvTube</div>
-      </div>
-
-    </div>
-
-    <!-- Library -->
-    <h2 class="you-library-title">Library</h2>
-
-    <div class="you-library-tabs">
-      <button class="library-tab active">Recents⌄</button>
-      <button class="library-tab">Downloaded</button>
-      <button class="library-tab">Playlists</button>
-      <button class="library-tab">Courses</button>
-    </div>
-
-    <!-- Watch later -->
-    <div class="you-library-row">
-      <div class="library-thumb">◷</div>
-
-      <div class="library-info">
-        <div class="library-name">Watch later</div>
-        <div class="library-private">Private</div>
-      </div>
-
-      <div class="library-more">•••</div>
-    </div>
-
-    <!-- Liked videos -->
-    <div class="you-library-row">
-      <div class="library-thumb">♡</div>
-
-      <div class="library-info">
-        <div class="library-name">Liked videos</div>
-        <div class="library-private">Private</div>
-      </div>
-
-      <div class="library-more">•••</div>
-    </div>
+    <div id="uploadStatus" class="upload-status"></div>
 
   </div>
-</section>
 
-<nav class="bottom-nav">
-  <button class="nav active" data-page="home">⌂<span>Home</span></button>
-  <button class="nav" data-page="shorts">▣<span>Shorts</span></button>
-  <button class="upload" id="uploadBtn">＋</button>
-  <button class="nav" data-page="subscriptions">▤<span>Subscriptions</span></button>
-  <button class="nav" data-page="profile">●<span>You</span></button>
-</nav>
-
-<div id="accountPopup" class="account-popup hidden">
-  <div class="account-popup-header">
-    <span>Accounts</span>
-    <a id="accountAddBtn" href="#" class="account-add-btn">＋</a>
-  </div>
-
-  <div class="account-main">
-    <img id="popupAvatar" class="popup-avatar" src="" alt="Profile">
-
-    <div class="popup-user-info">
-      <b id="popupName">DhruvTube</b>
-      <span id="popupEmail">Not signed in</span>
-    </div>
-  </div>
-
-  <button id="popupSignIn" class="popup-option" onclick="openAuthModal()">
-    Switch Google account
-  </button>
-
-  <button id="popupViewChannel" class="popup-option hidden" onclick="document.getElementById('accountPopup').classList.add('hidden'); showPage('profile');">
-    View your channel
-  </button>
-
-  <button id="popupSignOut" class="popup-option hidden" type="button" onclick="logoutCurrentUser()">
-    Sign out
-  </button>
 </div>
 
-<div id="authModal" class="auth-modal hidden">
-  <div class="auth-box">
-    <button id="authClose" type="button" class="auth-close"
-  onclick="document.getElementById('authModal').classList.add('hidden'); return false;"
-  style="position:absolute; top:12px; right:12px; z-index:99999; pointer-events:auto; cursor:pointer;">✕</button>
 
-    <h2 id="authTitle">Sign in to DhruvTube</h2>
+<!-- ================= AUTH MODAL ================= -->
+<div id="authModal" class="modal hidden">
+  <div class="modal-backdrop"></div>
 
-    <div id="authLoginForm">
-      <input id="loginEmail" type="email" placeholder="Email">
-      <input id="loginPassword" type="password" placeholder="Password">
+  <div class="upload-modal auth-modal">
+    <button id="closeAuth" class="modal-close">×</button>
 
-      <button id="loginSubmit" class="auth-submit">Sign in</button>
-
-      <p id="loginMessage" class="auth-message"></p>
-
-      <button id="showRegister" class="auth-switch">
-        Create an account
-      </button>
+    <div class="auth-head">
+      <span class="eyebrow">DHRUVTUBE</span>
+      <h2 id="authTitle">Sign in to DhruvTube</h2>
+      <p id="authMessage"></p>
     </div>
 
-    <div id="authRegisterForm" class="hidden">
-      <input id="registerUsername" type="text" placeholder="Username">
-      <input id="registerEmail" type="email" placeholder="Email">
-      <input id="registerPassword" type="password" placeholder="Password">
+    <input id="authUsername" class="studio-input hidden"
+      placeholder="Username">
 
-      <button id="registerSubmit" class="auth-submit">
-        Create account
-      </button>
+    <input id="authEmail" class="studio-input"
+      type="email" placeholder="Email">
 
-      <p id="registerMessage" class="auth-message"></p>
+    <input id="authPassword" class="studio-input"
+      type="password" placeholder="Password">
 
-      <button id="showLogin" class="auth-switch">
-        Already have an account? Sign in
-      </button>
-    </div>
+    <button id="authSubmit" class="primary-btn">
+      Sign in
+    </button>
+
+    <button id="authSwitch" class="text-btn">
+      Create an account
+    </button>
   </div>
 </div>
 
-<div id="player" class="player hidden">
-  <button id="closePlayer">✕</button>
-  <div class="player-screen">▶</div>
-  <div id="playerTitle"></div>
-</div>
-
-<script src="/app.js"></script>
-
+<script src="/app.js?v=studio1"></script>
 
 </body>
 </html>

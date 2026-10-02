@@ -17,6 +17,9 @@ async function main() {
     db = new SQL.Database();
   }
 
+  // ===============================
+  // USERS
+  // ===============================
   db.run(`
     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -26,21 +29,29 @@ async function main() {
       avatar TEXT,
       created_at TEXT DEFAULT CURRENT_TIMESTAMP
     );
+  `);
 
-    try {
-      const columns = db.exec("PRAGMA table_info(users)");
+  // ===============================
+  // GOOGLE ID MIGRATION
+  // ===============================
+  try {
+    const columns = db.exec("PRAGMA table_info(users)");
 
-      if (columns.length > 0) {
-        const names = columns[0].values.map(row => row[1]);
+    if (columns.length > 0) {
+      const names = columns[0].values.map(row => row[1]);
 
-        if (!names.includes("google_id")) {
-          db.run("ALTER TABLE users ADD COLUMN google_id TEXT");
-        }
+      if (!names.includes("google_id")) {
+        db.run("ALTER TABLE users ADD COLUMN google_id TEXT");
       }
-    } catch (error) {
-      console.error("Google ID migration error:", error);
     }
+  } catch (error) {
+    console.error("Google ID migration error:", error);
+  }
 
+  // ===============================
+  // VIDEOS
+  // ===============================
+  db.run(`
     CREATE TABLE IF NOT EXISTS videos (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       user_id INTEGER,
@@ -52,14 +63,24 @@ async function main() {
       is_short INTEGER DEFAULT 0,
       created_at TEXT DEFAULT CURRENT_TIMESTAMP
     );
+  `);
 
+  // ===============================
+  // LIKES
+  // ===============================
+  db.run(`
     CREATE TABLE IF NOT EXISTS likes (
       user_id INTEGER NOT NULL,
       video_id INTEGER NOT NULL,
       created_at TEXT DEFAULT CURRENT_TIMESTAMP,
       PRIMARY KEY(user_id, video_id)
     );
+  `);
 
+  // ===============================
+  // COMMENTS
+  // ===============================
+  db.run(`
     CREATE TABLE IF NOT EXISTS comments (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       user_id INTEGER NOT NULL,
@@ -67,21 +88,36 @@ async function main() {
       text TEXT NOT NULL,
       created_at TEXT DEFAULT CURRENT_TIMESTAMP
     );
+  `);
 
+  // ===============================
+  // SUBSCRIPTIONS
+  // ===============================
+  db.run(`
     CREATE TABLE IF NOT EXISTS subscriptions (
       subscriber_id INTEGER NOT NULL,
       channel_id INTEGER NOT NULL,
       created_at TEXT DEFAULT CURRENT_TIMESTAMP,
       PRIMARY KEY(subscriber_id, channel_id)
     );
+  `);
 
+  // ===============================
+  // WATCH HISTORY
+  // ===============================
+  db.run(`
     CREATE TABLE IF NOT EXISTS watch_history (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       user_id INTEGER,
       video_id INTEGER NOT NULL,
       watched_at TEXT DEFAULT CURRENT_TIMESTAMP
     );
+  `);
 
+  // ===============================
+  // NOTIFICATIONS
+  // ===============================
+  db.run(`
     CREATE TABLE IF NOT EXISTS notifications (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       user_id INTEGER NOT NULL,
@@ -93,8 +129,8 @@ async function main() {
     );
   `);
 
+  // Save database
   const data = db.export();
-
   fs.writeFileSync(DB_FILE, Buffer.from(data));
 
   db.close();

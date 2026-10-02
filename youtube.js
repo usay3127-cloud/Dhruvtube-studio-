@@ -15,24 +15,68 @@ router.get("/youtube/recommendations", async (req, res) => {
 
     const query = String(req.query.q || "technology").trim();
 
-    const url =
+    const searchUrl =
       "https://www.googleapis.com/youtube/v3/search" +
-      `?part=snippet&type=video&maxResults=10` +
+      `?part=snippet&type=video&maxResults=25` +
+      `&regionCode=US` +
+      `&videoEmbeddable=true` +
       `&q=${encodeURIComponent(query)}` +
       `&key=${encodeURIComponent(API_KEY)}`;
 
-    const response = await fetch(url);
-    const data = await response.json();
+    const searchResponse = await fetch(searchUrl);
+    const searchData = await searchResponse.json();
 
-    if (!response.ok) {
-      return res.status(response.status).json({
+    if (!searchResponse.ok) {
+      return res.status(searchResponse.status).json({
         success: false,
-        message: data?.error?.message || "YouTube API request failed."
+        message: searchData?.error?.message || "YouTube API request failed."
       });
     }
 
-    const videos = (data.items || [])
-      .filter(item => item.id?.videoId)
+    const searchItems = (searchData.items || [])
+      .filter(item => item.id?.videoId);
+
+    const channelIds = [
+      ...new Set(
+        searchItems
+          .map(item => item.snippet?.channelId)
+          .filter(Boolean)
+      )
+    ];
+
+    if (!channelIds.length) {
+      return res.json({
+        success: true,
+        query,
+        videos: []
+      });
+    }
+
+    const channelUrl =
+      "https://www.googleapis.com/youtube/v3/channels" +
+      `?part=snippet&id=${channelIds.join(",")}` +
+      `&key=${encodeURIComponent(API_KEY)}`;
+
+    const channelResponse = await fetch(channelUrl);
+    const channelData = await channelResponse.json();
+
+    if (!channelResponse.ok) {
+      return res.status(channelResponse.status).json({
+        success: false,
+        message: channelData?.error?.message ||
+          "YouTube channel lookup failed."
+      });
+    }
+
+    const usChannels = new Set(
+      (channelData.items || [])
+        .filter(channel => channel.snippet?.country === "US")
+        .map(channel => channel.id)
+    );
+
+    const videos = searchItems
+      .filter(item => usChannels.has(item.snippet?.channelId))
+      .slice(0, 10)
       .map(item => ({
         id: item.id.videoId,
         title: item.snippet?.title || "",
@@ -50,6 +94,7 @@ router.get("/youtube/recommendations", async (req, res) => {
     res.json({
       success: true,
       query,
+      region: "US",
       videos
     });
 
@@ -62,7 +107,6 @@ router.get("/youtube/recommendations", async (req, res) => {
     });
   }
 });
-
 
 router.get("/youtube/search", async (req, res) => {
   try {

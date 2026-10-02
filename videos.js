@@ -85,6 +85,177 @@ router.get("/videos", async (req, res) => {
 });
 
 
+// EDIT VIDEO — OWNER ONLY
+router.put("/videos/:id", async (req, res) => {
+  try {
+    const videoId = Number(req.params.id);
+    const userId = Number(req.body.user_id);
+
+    if (!Number.isInteger(videoId) || videoId <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid video ID."
+      });
+    }
+
+    if (!Number.isInteger(userId) || userId <= 0) {
+      return res.status(401).json({
+        success: false,
+        message: "Signed-in user required."
+      });
+    }
+
+    const db = await openDatabase();
+
+    const owner = db.exec(
+      "SELECT user_id FROM videos WHERE id = ? LIMIT 1",
+      [videoId]
+    );
+
+    if (!owner.length || !owner[0].values.length) {
+      db.close();
+      return res.status(404).json({
+        success: false,
+        message: "Video not found."
+      });
+    }
+
+    if (Number(owner[0].values[0][0]) !== userId) {
+      db.close();
+      return res.status(403).json({
+        success: false,
+        message: "Only the video owner can edit this video."
+      });
+    }
+
+    const title =
+      typeof req.body.title === "string"
+        ? req.body.title.trim()
+        : "";
+
+    const description =
+      typeof req.body.description === "string"
+        ? req.body.description.trim()
+        : "";
+
+    if (!title) {
+      db.close();
+      return res.status(400).json({
+        success: false,
+        message: "Title is required."
+      });
+    }
+
+    db.run(
+      `UPDATE videos
+       SET title = ?, description = ?
+       WHERE id = ? AND user_id = ?`,
+      [title, description, videoId, userId]
+    );
+
+    saveDatabase(db);
+    db.close();
+
+    res.json({
+      success: true,
+      message: "Video updated successfully.",
+      video_id: videoId
+    });
+
+  } catch (error) {
+    console.error("Edit video error:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Could not update video.",
+      error: error.message
+    });
+  }
+});
+
+
+// DELETE VIDEO — OWNER ONLY
+router.delete("/videos/:id", async (req, res) => {
+  try {
+    const videoId = Number(req.params.id);
+    const userId = Number(req.body.user_id);
+
+    if (!Number.isInteger(videoId) || videoId <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid video ID."
+      });
+    }
+
+    if (!Number.isInteger(userId) || userId <= 0) {
+      return res.status(401).json({
+        success: false,
+        message: "Signed-in user required."
+      });
+    }
+
+    const db = await openDatabase();
+
+    const result = db.exec(
+      `SELECT filename, user_id
+       FROM videos
+       WHERE id = ?
+       LIMIT 1`,
+      [videoId]
+    );
+
+    if (!result.length || !result[0].values.length) {
+      db.close();
+      return res.status(404).json({
+        success: false,
+        message: "Video not found."
+      });
+    }
+
+    const filename = result[0].values[0][0];
+    const ownerId = Number(result[0].values[0][1]);
+
+    if (ownerId !== userId) {
+      db.close();
+      return res.status(403).json({
+        success: false,
+        message: "Only the video owner can delete this video."
+      });
+    }
+
+    db.run("DELETE FROM likes WHERE video_id = ?", [videoId]);
+    db.run("DELETE FROM videos WHERE id = ? AND user_id = ?", [
+      videoId,
+      userId
+    ]);
+
+    saveDatabase(db);
+    db.close();
+
+    const videoPath = path.join(__dirname, "uploads", filename);
+
+    if (filename && fs.existsSync(videoPath)) {
+      fs.unlinkSync(videoPath);
+    }
+
+    res.json({
+      success: true,
+      message: "Video deleted successfully.",
+      video_id: videoId
+    });
+
+  } catch (error) {
+    console.error("Delete video error:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Could not delete video.",
+      error: error.message
+    });
+  }
+});
+
+
 // ADD VIDEO VIEW
 router.post("/videos/:id/view", async (req, res) => {
   try {
@@ -331,3 +502,145 @@ router.get("/videos/:id/likes", async (req, res) => {
 
 
 module.exports = router;
+
+
+// EDIT VIDEO — OWNER ONLY
+router.put("/videos/:id", async (req, res) => {
+  try {
+    const videoId = Number(req.params.id);
+    const userId = Number(req.body.user_id);
+    const title = String(req.body.title || "").trim();
+    const description = String(req.body.description || "").trim();
+
+    if (!Number.isInteger(videoId) || !Number.isInteger(userId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid video or user ID."
+      });
+    }
+
+    if (!title) {
+      return res.status(400).json({
+        success: false,
+        message: "Title is required."
+      });
+    }
+
+    const db = await openDatabase();
+
+    const result = db.exec(
+      "SELECT user_id FROM videos WHERE id = ? LIMIT 1",
+      [videoId]
+    );
+
+    if (!result.length || !result[0].values.length) {
+      db.close();
+      return res.status(404).json({
+        success: false,
+        message: "Video not found."
+      });
+    }
+
+    const ownerId = Number(result[0].values[0][0]);
+
+    if (ownerId !== userId) {
+      db.close();
+      return res.status(403).json({
+        success: false,
+        message: "Only the video owner can edit this video."
+      });
+    }
+
+    db.run(
+      "UPDATE videos SET title = ?, description = ? WHERE id = ?",
+      [title, description, videoId]
+    );
+
+    saveDatabase(db);
+    db.close();
+
+    res.json({
+      success: true,
+      message: "Video updated successfully."
+    });
+
+  } catch (error) {
+    console.error("Edit video error:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Could not update video.",
+      error: error.message
+    });
+  }
+});
+
+
+// DELETE VIDEO — OWNER ONLY
+router.delete("/videos/:id", async (req, res) => {
+  try {
+    const videoId = Number(req.params.id);
+    const userId = Number(req.body.user_id);
+
+    if (!Number.isInteger(videoId) || !Number.isInteger(userId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid video or user ID."
+      });
+    }
+
+    const db = await openDatabase();
+
+    const result = db.exec(
+      "SELECT user_id, filename FROM videos WHERE id = ? LIMIT 1",
+      [videoId]
+    );
+
+    if (!result.length || !result[0].values.length) {
+      db.close();
+      return res.status(404).json({
+        success: false,
+        message: "Video not found."
+      });
+    }
+
+    const ownerId = Number(result[0].values[0][0]);
+    const filename = result[0].values[0][1];
+
+    if (ownerId !== userId) {
+      db.close();
+      return res.status(403).json({
+        success: false,
+        message: "Only the video owner can delete this video."
+      });
+    }
+
+    db.run(
+      "DELETE FROM videos WHERE id = ?",
+      [videoId]
+    );
+
+    saveDatabase(db);
+    db.close();
+
+    const videoFile = path.join(__dirname, "uploads", filename);
+
+    if (fs.existsSync(videoFile)) {
+      fs.unlinkSync(videoFile);
+    }
+
+    res.json({
+      success: true,
+      message: "Video deleted successfully."
+    });
+
+  } catch (error) {
+    console.error("Delete video error:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Could not delete video.",
+      error: error.message
+    });
+  }
+});

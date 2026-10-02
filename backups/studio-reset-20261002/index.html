@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+  <title>DhruvTube</title>
+  <link rel="stylesheet" href="/style.css?v=7">
+</head>
+
+<body>
+
+<!-- ================= TOP BAR ================= -->
+
+<header class="topbar">
+  <div class="brand">
+    <div class="yt-icon">▶</div>
+    <b>DhruvTube</b>
+  </div>
+
+  <div class="top-actions">
+    <button id="searchOpen" aria-label="Search">⌕</button>
+    <button id="themeBtn" aria-label="Theme">☾</button>
+    <button id="refreshBtn" aria-label="Refresh">↻</button>
+    <button id="profileBtn" class="avatar" aria-label="Account">D</button>
+  </div>
+</header>
+
+<!-- ================= SEARCH ================= -->
+
+<div id="searchPanel" class="search-panel">
+  <button id="searchBack">←</button>
+  <input id="searchInput" placeholder="Search videos, channels, games...">
+  <button id="searchBtn">⌕</button>
+</div>
+
+<!-- ================= CATEGORY BAR ================= -->
+
+<nav class="categories">
+  <button class="selected">All</button>
+  <button>Gaming</button>
+  <button>Music</button>
+  <button>Live</button>
+  <button>News</button>
+  <button>Sports</button>
+  <button>Technology</button>
+  <button>Education</button>
+</nav>
+
+<!-- ================= HOME ================= -->
+
+<main id="home">
+
+  <section class="hero">
+    <div class="hero-content">
+      <span>WELCOME TO</span>
+      <h1>DhruvTube</h1>
+      <p>Gaming • Entertainment • More</p>
+
+      <button class="hero-play" type="button">
+        ▶&nbsp; Explore
+      </button>
+    </div>
+
+    <div class="hero-art">
+      <div class="hero-glow"></div>
+      <div class="hero-controller"></div>
+      <div class="hero-play-icon">▶</div>
+    </div>
+  </section>
+
+  <section class="section-head">
+    <div>
+      <h2>🔥 Recommended</h2>
+      <small>For you</small>
+    </div>
+    <button>See all ›</button>
+  </section>
+
+  <div id="videoGrid" class="video-grid"></div>
+
+</main>
+
+<!-- ================= SHORTS ================= -->
+
+<section id="shortsPage" class="page hidden">
+
+  <div class="page-title">
+    <div>
+      <span class="page-kicker">EXPLORE</span>
+      <h2>Shorts</h2>
+    </div>
+    <button>⌕</button>
+  </div>
+
+  <div class="shorts-tabs">
+    <button class="selected">All</button>
+    <button>Gaming</button>
+    <button>Music</button>
+    <button>Comedy</button>
+    <button>Tech</button>
+  </div>
+
+  <div id="shortsGrid" class="shorts-grid"></div>
+
+</section>
+
+<!-- ================= SUBSCRIPTIONS ================= -->
+
+<section id="subscriptionsPage" class="page hidden">
+
+  <div class="page-title">
+    <div>
+      <span class="page-kicker">YOUR CHANNELS</span>
+      <h2>Subscriptions</h2>
+    </div>
+    <button>⌕</button>
+  </div>
+
+  <div class="subscription-feature">
+    <div class="subscription-avatar">D</div>
+    <div>
+      <b>DhruvTube</b>
+      <span>Gaming & Entertainment</span>
+    </div>
+    <button>Subscribed</button>
+  </div>
+
+  <div class="empty">
+    <div>◈</div>
+    <h3>No subscriptions yet</h3>
+    <p>Subscribe to channels to see their latest videos.</p>
+  </div>
+
+</section>
+
+<!-- ================= YOU / PROFILE ================= -->
+
+<section id="profilePage" class="page hidden">
+
+  <div class="you-page">
+
+    <div class="you-top">
+      <div>
+        <span class="page-kicker">ACCOUNT</span>
+        <h2>Your Profile</h2>
+      </div>
+
+      <div class="you-top-actions">
+        <span class="you-icon">⌕</span>
+        <span class="you-icon">⚙</span>
+      </div>
+    </div>
+
+    <div class="you-profile">
+      <div class="profile-avatar-ring">
+        <img class="you-big-avatar" id="accountAvatar" src="" alt="Profile">
+      </div>
+
+      <div class="you-profile-info">
+        <div class="you-name" id="accountName">DhruvTube</div>
+        <div class="you-handle" id="accountHandle">@dhruvtube</div>
+        <div class="account-status" id="accountLoggedIn">Not signed in</div>
+      </div>
+    </div>
+
+    <div class="you-actions">
+      <button class="you-action primary" id="viewChannelBtn">
+        View channel
+      </button>
+
+      <button class="you-action" id="loginBtn">
+        Sign in
+      </button>
+    </div>
+
+    <div class="you-section-head">
+      <h2>History</h2>
+      <span>›</span>
+    </div>
+
+    <div class="you-history">
+
+      <div class="you-history-card">
+        <div class="you-thumb">▶</div>
+        <div class="you-video-title">Recently watched video</div>
+        <div class="you-video-channel">DhruvTube</div>
+      </div>
+
+      <div class="you-history-card">
+        <div class="you-thumb">▶</div>
+        <div class="you-video-title">Your watched videos</div>
+        <div class="you-video-channel">DhruvTube</div>
+      </div>
+
+      <div class="you-history-card">
+        <div class="you-thumb">▶</div>
+        <div class="you-video-title">Continue watching</div>
+        <div class="you-video-channel">DhruvTube</div>
+      </div>
+
+    </div>
+
+    <h2 class="you-library-title">Library</h2>
+
+    <div class="you-library-tabs">
+      <button class="library-tab active">Recents</button>
+      <button class="library-tab">Downloaded</button>
+      <button class="library-tab">Playlists</button>
+      <button class="library-tab">Courses</button>
+    </div>
+
+    <div class="you-library-row">
+      <div class="library-thumb">◷</div>
+      <div class="library-info">
+        <div class="library-name">Watch later</div>
+        <div class="library-private">Private</div>
+      </div>
+      <div class="library-more">•••</div>
+    </div>
+
+    <div class="you-library-row">
+      <div class="library-thumb">♡</div>
+      <div class="library-info">
+        <div class="library-name">Liked videos</div>
+        <div class="library-private">Private</div>
+      </div>
+      <div class="library-more">•••</div>
+    </div>
+
+  </div>
+
+</section>
+
+<!-- ================= BOTTOM NAV ================= -->
+
+<nav class="bottom-nav">
+
+  <button class="nav active" data-page="home">
+    <span class="nav-icon">⌂</span>
+    <span>Home</span>
+  </button>
+
+  <button class="nav" data-page="shorts">
+    <span class="nav-icon">ϟ</span>
+    <span>Shorts</span>
+  </button>
+
+  <button class="upload" id="uploadBtn" aria-label="Upload">
+    ＋
+  </button>
+
+  <button class="nav" data-page="subscriptions">
+    <span class="nav-icon">▤</span>
+    <span>Subscriptions</span>
+  </button>
+
+  <button class="nav" data-page="profile">
+    <span class="nav-icon">◉</span>
+    <span>You</span>
+  </button>
+
+</nav>
+
+<!-- ================= ACCOUNT POPUP ================= -->
+
+<div id="accountPopup" class="account-popup hidden">
+
+  <div class="account-popup-header">
+    <span>DhruvTube Account</span>
+    <a id="accountAddBtn" href="#" class="account-add-btn">＋</a>
+  </div>
+
+  <div class="account-main">
+
+    <div class="popup-avatar-ring">
+      <img id="popupAvatar" class="popup-avatar" src="" alt="Profile">
+    </div>
+
+    <div class="popup-user-info">
+      <b id="popupName">DhruvTube</b>
+      <span id="popupEmail">Not signed in</span>
+    </div>
+
+  </div>
+
+  <button id="popupSignIn" class="popup-option"
+          onclick="openAuthModal()">
+    <span>G</span>
+    Sign in with Google
+  </button>
+
+  <button id="popupViewChannel"
+          class="popup-option hidden"
+          onclick="document.getElementById('accountPopup').classList.add('hidden'); showPage('profile');">
+    ◉
+    View your channel
+  </button>
+
+  <button id="popupSignOut"
+          class="popup-option hidden"
+          type="button"
+          onclick="logoutCurrentUser()">
+    ↪
+    Sign out
+  </button>
+
+</div>
+
+<!-- ================= AUTH MODAL ================= -->
+
+<div id="authModal" class="auth-modal hidden">
+
+  <div class="auth-box">
+
+    <button id="authClose"
+            type="button"
+            class="auth-close"
+            onclick="document.getElementById('authModal').classList.add('hidden'); return false;">
+      ✕
+    </button>
+
+    <div class="auth-logo">
+      <div class="yt-icon">▶</div>
+      <b>DhruvTube</b>
+    </div>
+
+    <h2 id="authTitle">Sign in to DhruvTube</h2>
+
+    <p class="auth-subtitle">
+      Continue your gaming journey
+    </p>
+
+    <div id="authLoginForm">
+
+      <button class="google-login-button"
+              type="button"
+              onclick="openAuthModal()">
+        <span>G</span>
+        Continue with Google
+      </button>
+
+      <div class="auth-divider">
+        <span>or</span>
+      </div>
+
+      <input id="loginEmail"
+             type="email"
+             placeholder="Email">
+
+      <input id="loginPassword"
+             type="password"
+             placeholder="Password">
+
+      <button id="loginSubmit" class="auth-submit">
+        Sign in
+      </button>
+
+      <p id="loginMessage" class="auth-message"></p>
+
+      <button id="showRegister" class="auth-switch">
+        Create an account
+      </button>
+
+    </div>
+
+    <div id="authRegisterForm" class="hidden">
+
+      <input id="registerUsername"
+             type="text"
+             placeholder="Username">
+
+      <input id="registerEmail"
+             type="email"
+             placeholder="Email">
+
+      <input id="registerPassword"
+             type="password"
+             placeholder="Password">
+
+      <button id="registerSubmit" class="auth-submit">
+        Create account
+      </button>
+
+      <p id="registerMessage" class="auth-message"></p>
+
+      <button id="showLogin" class="auth-switch">
+        Already have an account? Sign in
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ================= UPLOAD MODAL ================= -->
+
+<div id="uploadModal" class="modal hidden">
+
+  <div class="upload-box">
+
+    <button id="uploadClose" type="button">✕</button>
+
+    <h2>Upload to DhruvTube</h2>
+    <p>Share your next gaming moment.</p>
+
+    <form id="dhruvUploadForm">
+
+      <input id="uploadTitle"
+             type="text"
+             placeholder="Video title"
+             required>
+
+      <textarea id="uploadDescription"
+                placeholder="Description"></textarea>
+
+      <input id="uploadVideoFile"
+             type="file"
+             accept="video/*"
+             required>
+
+      <label>
+        <input id="uploadShort" type="checkbox">
+        Upload as Short
+      </label>
+
+      <button id="startUpload" type="submit">
+        Upload video
+      </button>
+
+      <div id="uploadProgress"></div>
+
+    </form>
+
+  </div>
+
+</div>
+
+<!-- ================= PLAYER ================= -->
+
+<div id="player" class="player hidden">
+
+  <button id="closePlayer">✕</button>
+
+  <div class="player-screen">
+    ▶
+  </div>
+
+  <div id="playerTitle"></div>
+
+</div>
+
+<script src="/app.js"></script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  if (document.querySelector(".dt-sidebar")) return;
+
+  const s = document.createElement("aside");
+  s.className = "dt-sidebar";
+
+  s.innerHTML = `
+    <button class="dt-side-btn active" data-page="home">
+      <b class="ico">⌂</b><span>Home</span>
+    </button>
+    <button class="dt-side-btn" data-page="shorts">
+      <b class="ico">ϟ</b><span>Shorts</span>
+    </button>
+    <button class="dt-side-btn" data-page="subscriptions">
+      <b class="ico">▤</b><span>Subs</span>
+    </button>
+    <button class="dt-side-btn" data-cat="Gaming">
+      <b class="ico"></b><span>Gaming</span>
+    </button>
+    <button class="dt-side-btn" data-cat="Music">
+      <b class="ico">♫</b><span>Music</span>
+    </button>
+    <button class="dt-side-btn" data-cat="Live">
+      <b class="ico">◉</b><span>Live</span>
+    </button>
+    <button class="dt-side-btn" data-cat="Sports">
+      <b class="ico">⚽</b><span>Sports</span>
+    </button>
+    <button class="dt-side-btn" data-cat="News">
+      <b class="ico">▣</b><span>News</span>
+    </button>
+  `;
+
+  document.body.appendChild(s);
+
+  s.querySelectorAll("[data-page]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelector(
+        '.nav[data-page="' + btn.dataset.page + '"]'
+      )?.click();
+
+      s.querySelectorAll(".dt-side-btn")
+        .forEach(x => x.classList.remove("active"));
+
+      btn.classList.add("active");
+    });
+  });
+
+  s.querySelectorAll("[data-cat]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const target = [...document.querySelectorAll(".categories button")]
+        .find(x =>
+          x.textContent.trim().toLowerCase() ===
+          btn.dataset.cat.toLowerCase()
+        );
+
+      target?.click();
+
+      s.querySelectorAll(".dt-side-btn")
+        .forEach(x => x.classList.remove("active"));
+
+      btn.classList.add("active");
+    });
+  });
+});
+</script>
+
+
+<script>
+(function () {
+  let welcomePlayed = false;
+
+  function playDhruvWelcome() {
+    if (welcomePlayed) return;
+
+    if (!("speechSynthesis" in window) ||
+        !("SpeechSynthesisUtterance" in window)) {
+      return;
+    }
+
+    welcomePlayed = true;
+
+    try {
+      window.speechSynthesis.cancel();
+
+      const text = new SpeechSynthesisUtterance(
+        "Welcome to DhruvTube boss"
+      );
+
+      text.lang = "en-IN";
+      text.rate = 0.88;
+      text.pitch = 1;
+      text.volume = 1;
+
+      window.speechSynthesis.resume();
+      window.speechSynthesis.speak(text);
+    } catch (e) {
+      welcomePlayed = false;
+    }
+  }
+
+  function removeGamingIcon() {
+    document.querySelectorAll(
+      '.dt-side-btn[data-cat="Gaming"] .ico'
+    ).forEach(function (icon) {
+      icon.remove();
+    });
+  }
+
+  window.addEventListener("DOMContentLoaded", function () {
+
+    removeGamingIcon();
+
+    /*
+      Chrome Android normally blocks speech autoplay.
+      Try automatically first.
+    */
+    setTimeout(function () {
+      playDhruvWelcome();
+    }, 1000);
+
+    /*
+      Guaranteed fallback:
+      first tap anywhere on DhruvTube starts the welcome voice.
+    */
+    document.addEventListener(
+      "pointerdown",
+      function () {
+        playDhruvWelcome();
+      },
+      {
+        once: true,
+        passive: true
+      }
+    );
+
+    /*
+      Also handle older Android browsers.
+    */
+    document.addEventListener(
+      "touchstart",
+      function () {
+        playDhruvWelcome();
+      },
+      {
+        once: true,
+        passive: true
+      }
+    );
+  });
+
+})();
+</script>
+
+
+<script data-dhruvtube-welcome="chrome">
+/* DHRUVTUBE_CHROME_WELCOME */
+(function () {
+  let welcomed = false;
+
+  function welcomeDhruvTube() {
+    if (welcomed) return;
+    if (!("speechSynthesis" in window) ||
+        !("SpeechSynthesisUtterance" in window)) return;
+
+    welcomed = true;
+
+    try {
+      speechSynthesis.cancel();
+
+      const voice = new SpeechSynthesisUtterance(
+        "Welcome to DhruvTube boss"
+      );
+
+      voice.lang = "en-IN";
+      voice.rate = 0.88;
+      voice.pitch = 1;
+      voice.volume = 1;
+
+      speechSynthesis.resume();
+      speechSynthesis.speak(voice);
+    } catch (e) {
+      welcomed = false;
+    }
+  }
+
+  window.addEventListener("DOMContentLoaded", function () {
+    setTimeout(welcomeDhruvTube, 700);
+  });
+
+  // Chrome autoplay restriction ke liye first user interaction fallback
+  document.addEventListener("pointerdown", welcomeDhruvTube, {
+    once: true,
+    passive: true
+  });
+})();
+</script>
+</body>
+</html>
+
+
+
+

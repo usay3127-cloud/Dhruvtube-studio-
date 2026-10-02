@@ -109,36 +109,37 @@ router.post(
       const db = await openDatabase();
 
 
-      /*
-        TEMPORARY LOCAL USER
+      const ownerUserId = Number(req.body.user_id);
 
-        Authentication abhi nahi bana hai.
-        Isliye local prototype me user_id = 1.
-      */
+      if (!Number.isInteger(ownerUserId) || ownerUserId <= 0) {
+        db.close();
 
-      const guestUserId = 1;
+        fs.unlinkSync(req.file.path);
 
+        return res.status(401).json({
+          success: false,
+          message: "Valid signed-in user is required."
+        });
+      }
 
-      /*
-        Ensure user #1 exists.
-      */
+      const owner = db.exec(
+        "SELECT id FROM users WHERE id = ? LIMIT 1",
+        [ownerUserId]
+      );
 
-      db.run(`
-        INSERT OR IGNORE INTO users
-        (
-          id,
-          username,
-          email,
-          password_hash
-        )
-        VALUES
-        (
-          1,
-          'DhruvTube User',
-          'local@dhruvtube.local',
-          'local-prototype'
-        )
-      `);
+      if (
+        owner.length === 0 ||
+        owner[0].values.length === 0
+      ) {
+        db.close();
+
+        fs.unlinkSync(req.file.path);
+
+        return res.status(403).json({
+          success: false,
+          message: "Video owner not found."
+        });
+      }
 
 
       /*
@@ -159,7 +160,7 @@ router.post(
         (?, ?, ?, ?, ?)
         `,
         [
-          guestUserId,
+          ownerUserId,
           title,
           description,
           req.file.filename,

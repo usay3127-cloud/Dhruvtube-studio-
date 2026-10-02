@@ -1,3 +1,4 @@
+alert("DhruvTube app.js loaded");
 const API = "/api";
 
 let videos = [];
@@ -36,7 +37,10 @@ async function loadYouTubeVideos(query = "technology") {
 }
 
 function renderYouTubeVideos(list) {
-  if (!grid || !list.length) return;
+  console.log("YOUTUBE RENDER:", list);
+  console.log("YOUTUBE GRID:", grid);
+
+  if (!grid || !Array.isArray(list) || !list.length) return;
 
   list.forEach(v => {
     const card = document.createElement("article");
@@ -73,104 +77,54 @@ function renderYouTubeVideos(list) {
       </div>
     `;
 
-    card.onclick = () => openYouTubePlayer(v);
+    card.addEventListener("click", () => {
+      if (typeof openPlayer === "function") {
+        openPlayer({
+          ...v,
+          type: "YouTube"
+        });
+      } else if (v.embedUrl) {
+        window.open(v.embedUrl, "_blank");
+      }
+    });
 
     grid.appendChild(card);
   });
 }
 
-function openYouTubePlayer(v) {
-  playerTitle.textContent = v.title || "YouTube Video";
-
-  const screen = player.querySelector(".player-screen");
-
-  if (screen) {
-    screen.innerHTML = `
-      <iframe
-        src="${escapeHTML(v.embedUrl)}?autoplay=1&rel=0"
-        style="width:100%;height:100%;border:0;background:#000;"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-        allowfullscreen>
-      </iframe>
-    `;
-  }
-
-  let details = document.getElementById("playerDetails");
-  if (details) details.remove();
-
-  details = document.createElement("div");
-  details.id = "playerDetails";
-
-  details.style.cssText = `
-    padding:16px;
-    color:var(--text,#111);
-    background:var(--card,#fff);
-    box-sizing:border-box;
-  `;
-
-  details.innerHTML = `
-    <div style="
-      font-size:20px;
-      font-weight:700;
-      line-height:1.35;
-      margin-bottom:8px;
-    ">
-      ${escapeHTML(v.title || "YouTube Video")}
-    </div>
-
-    <div style="
-      font-size:14px;
-      opacity:.7;
-      margin-bottom:14px;
-    ">
-      ${escapeHTML(v.channel || "YouTube")}
-    </div>
-
-    <div style="
-      display:flex;
-      gap:10px;
-      margin-bottom:16px;
-      overflow-x:auto;
-    ">
-      <button id="shareYouTubeButton">
-        ↗ Share
-      </button>
-
-      <button
-        onclick="window.open('https://www.youtube.com/watch?v=${encodeURIComponent(v.id)}','_blank')">
-        ▶ Open YouTube
-      </button>
-    </div>
-  `;
-
-  player.appendChild(details);
-
-  player.classList.remove("hidden");
-}
-
-
 async function loadVideos() {
   console.log("LOAD VIDEOS STARTED", grid);
+  alert("LOAD VIDEOS STARTED");
+
   try {
+    // ===============================
+    // 1. LOAD LOCAL DHRUVTUBE VIDEOS
+    // ===============================
     const response = await fetch(`${API}/videos`);
 
-    if (!response.ok) {
-      throw new Error("Videos API not available");
-    }
+    if (response.ok) {
+      const data = await response.json();
 
-    const data = await response.json();
-
-    if (data.success && Array.isArray(data.videos)) {
-      videos = data.videos;
+      if (data.success && Array.isArray(data.videos)) {
+        videos = data.videos;
+      } else {
+        videos = [];
+      }
     } else {
       videos = [];
     }
 
+    // Render local videos first
     renderVideos();
 
-    // Load YouTube videos alongside DhruvTube videos
+    // ===============================
+    // 2. LOAD USA YOUTUBE VIDEOS
+    // ===============================
     const youtubeVideos = await loadYouTubeVideos("technology");
 
+    console.log("USA YOUTUBE VIDEOS:", youtubeVideos);
+
+    // Add YouTube recommendations to same Recommended grid
     if (youtubeVideos.length) {
       renderYouTubeVideos(youtubeVideos);
     }
@@ -178,27 +132,31 @@ async function loadVideos() {
   } catch (error) {
     console.error("Load videos error:", error);
 
+    // Even if local videos fail, still show YouTube recommendations
     videos = [];
 
-    grid.innerHTML = `
-      <div style="padding:30px;text-align:center;">
-        <h3>No videos yet</h3>
-        <p>Upload your first video to DhruvTube.</p>
-      </div>
-    `;
+    if (grid) {
+      grid.innerHTML = "";
+    }
 
-    // Even if local videos fail, try YouTube
     const youtubeVideos = await loadYouTubeVideos("technology");
 
     if (youtubeVideos.length) {
-      grid.innerHTML = "";
       renderYouTubeVideos(youtubeVideos);
+    } else if (grid) {
+      grid.innerHTML = `
+        <div style="padding:30px;text-align:center;">
+          <h3>No videos found</h3>
+          <p>Try again later.</p>
+        </div>
+      `;
     }
   }
 }
 
 // ===============================
 // RENDER VIDEOS
+
 // ===============================
 
 function renderVideos(list = videos) {
@@ -307,7 +265,25 @@ async function openPlayer(v) {
 
   if (screen) {
 
-    if (v.url) {
+    if (v.embedUrl) {
+
+      screen.innerHTML = `
+        <iframe
+          src="${escapeHTML(v.embedUrl)}"
+          title="${escapeHTML(v.title || "YouTube Video")}"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen
+          style="
+            width:100%;
+            height:100%;
+            border:0;
+            display:block;
+            background:#000;
+          "
+        ></iframe>
+      `;
+
+    } else if (v.url) {
 
       screen.innerHTML = `
         <video
@@ -880,70 +856,71 @@ document.getElementById("searchOpen").onclick = () => {
 };
 
 
-document.getElementById("searchBack").onclick = () => {
+document.getElementById("searchBack").onclick = async () => {
 
   searchPanel.classList.remove("show");
 
   searchInput.value = "";
 
-  renderVideos();
+  await loadVideos();
 };
 
 
-function doSearch() {
+async function doSearch() {
 
-  const q =
-    searchInput.value.trim().toLowerCase();
+  const q = searchInput.value.trim();
 
   if (!q) {
-    renderVideos();
+    await loadVideos();
     return;
   }
 
+  const oldText = searchInput.value;
 
-  const filtered =
-    videos.filter(v => {
-
-      const title =
-        (v.title || "").toLowerCase();
-
-      const channel =
-        (v.channel || "").toLowerCase();
-
-      const type =
-        (v.type || "").toLowerCase();
-
-      const description =
-        (v.description || "").toLowerCase();
-
-      return (
-        title.includes(q) ||
-        channel.includes(q) ||
-        type.includes(q) ||
-        description.includes(q)
-      );
-
-    });
-
-
-  renderVideos(filtered);
-
-
-  document
-    .getElementById("home")
-    .classList.remove("hidden");
-
-  document
-    .querySelectorAll(".page")
-    .forEach(
-      p => p.classList.add("hidden")
+  try {
+    const response = await fetch(
+      `${API}/youtube/search?q=${encodeURIComponent(q)}`
     );
 
-  document
-    .getElementById("home")
-    .classList.remove("hidden");
-}
+    const data = await response.json();
 
+    if (!data.success || !Array.isArray(data.videos)) {
+      throw new Error(data.message || "Search failed");
+    }
+
+    grid.innerHTML = "";
+
+    if (!data.videos.length) {
+      grid.innerHTML = `
+        <div style="padding:30px;text-align:center;">
+          <h3>No videos found</h3>
+          <p>Try another search.</p>
+        </div>
+      `;
+      return;
+    }
+
+    renderYouTubeVideos(data.videos);
+
+    document.getElementById("home").classList.remove("hidden");
+
+    document.querySelectorAll(".page").forEach(p => {
+      p.classList.add("hidden");
+    });
+
+    document.getElementById("home").classList.remove("hidden");
+
+  } catch (error) {
+    console.error("YouTube search error:", error);
+
+    grid.innerHTML = `
+      <div style="padding:30px;text-align:center;">
+        <h3>Search failed</h3>
+        <p>Please try again.</p>
+      </div>
+    `;
+  }
+}
 
 document.getElementById("searchBtn").onclick =
   doSearch;
@@ -1083,12 +1060,14 @@ document
   });
 
 
-document.getElementById("profileBtn").onclick =
-  () => {
+document.getElementById("profileBtn").onclick = () => {
+  const popup = document.getElementById("accountPopup");
 
-    showPage("profile");
-
-  };
+  if (popup) {
+    popup.classList.toggle("hidden");
+    updateAccountPopup();
+  }
+};
 
 
 // ===============================
@@ -1180,9 +1159,37 @@ function openUploadForm() {
         accept="video/*"
         style="
           width:100%;
+          margin-bottom:8px;
+        "
+      >
+
+      <div style="
+        font-size:12px;
+        opacity:.7;
+        margin-bottom:15px;
+      ">
+        Video selected above
+      </div>
+
+
+      <input
+        id="uploadThumbnail"
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        style="
+          width:100%;
           margin-bottom:15px;
         "
       >
+
+      <div style="
+        font-size:12px;
+        opacity:.7;
+        margin-top:-10px;
+        margin-bottom:15px;
+      ">
+        YouTube thumbnail (optional)
+      </div>
 
 
       <input
@@ -1266,11 +1273,15 @@ function openUploadForm() {
   document.body.appendChild(form);
 
 
-  document.getElementById("uploadClose").onclick =
-    () => form.remove();
+  form.querySelector("#uploadClose").onclick =
+    (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      form.remove();
+    };
 
 
-  document.getElementById("startUpload").onclick =
+  form.querySelector("#startUpload").onclick =
     uploadVideo;
 }
 
@@ -1387,6 +1398,254 @@ async function uploadVideo() {
       "Upload successful!";
 
 
+    
+    const youtubeFlowInfo = document.createElement("div");
+    youtubeFlowInfo.textContent =
+      "🔒 Automatic flow: PRIVATE → YouTube Check → PUBLIC / DELETE";
+    youtubeFlowInfo.style.cssText = `
+      width:100%;
+      margin-top:10px;
+      padding:12px;
+      box-sizing:border-box;
+      border-radius:10px;
+      background:#f3f4f6;
+      color:#222;
+      font-size:13px;
+      line-height:1.4;
+    `;
+    document.querySelector("#dhruvUploadForm > div").appendChild(youtubeFlowInfo);
+
+const ytButton = document.createElement("button");
+    ytButton.textContent = "Upload to YouTube";
+    ytButton.style.cssText = `
+      width:100%;
+      padding:13px;
+      margin-top:12px;
+      border:0;
+      border-radius:9px;
+      background:#cc0000;
+      color:white;
+      font-size:16px;
+      font-weight:bold;
+      cursor:pointer;
+    `;
+
+    document.querySelector("#dhruvUploadForm > div").appendChild(ytButton);
+
+
+async function checkYouTubeVideoStatus(videoId, progressElement) {
+  const maxAttempts = 6;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      const response = await fetch(
+        `${API}/youtube/video-status?id=${encodeURIComponent(videoId)}`
+      );
+
+      const data = await response.json();
+
+      if (response.status === 404) {
+        progressElement.textContent =
+          "❌ YouTube rejection detected. DhruvTube automatically deleted the private video.";
+
+        return {
+          success: false,
+          action: "deleted"
+        };
+      }
+
+      if (!response.ok || !data.success) {
+        throw new Error(
+          data.message ||
+          "YouTube status check failed."
+        );
+      }
+
+      const processing =
+        data.processingStatus || "unknown";
+
+      const upload =
+        data.uploadStatus || "unknown";
+
+      const privacy =
+        data.privacyStatus || "unknown";
+
+      if (
+        data.failureReason ||
+        data.rejectionReason
+      ) {
+        progressElement.textContent =
+          `❌ YouTube rejection: ${
+            data.rejectionReason ||
+            data.failureReason
+          }`;
+
+        return {
+          ...data,
+          action: "deleted"
+        };
+      }
+
+      if (
+        processing === "processed" &&
+        upload === "uploaded"
+      ) {
+        if (privacy === "public") {
+          progressElement.textContent =
+            "✅ YouTube check completed. Video is now PUBLIC automatically.";
+
+          return {
+            ...data,
+            action: "published"
+          };
+        }
+
+        progressElement.textContent =
+          "⏳ YouTube processing complete. Automatic Public conversion is in progress...";
+      } else {
+        progressElement.textContent =
+          `⏳ YouTube processing/check: ${processing} (${attempt}/${maxAttempts})`;
+      }
+
+      await new Promise(resolve =>
+        setTimeout(resolve, 5000)
+      );
+
+    } catch (error) {
+      console.error(
+        "YouTube status check error:",
+        error
+      );
+
+      progressElement.textContent =
+        "❌ YouTube status check failed: " +
+        error.message;
+
+      return {
+        success: false,
+        action: "check_failed",
+        message: error.message
+      };
+    }
+  }
+
+  progressElement.textContent =
+    "⏳ YouTube is still processing/checking. Video remains PRIVATE.";
+
+  return {
+    success: false,
+    action: "still_processing"
+  };
+}
+
+    ytButton.onclick = async () => {
+      try {
+        ytButton.disabled = true;
+        ytButton.textContent = "Checking YouTube account...";
+
+        const accountResponse =
+          await fetch(`${API}/youtube/status`);
+
+        const account = await accountResponse.json();
+
+        if (!account.connected) {
+          throw new Error(
+            "YouTube account connected nahi hai."
+          );
+        }
+
+        const channelName =
+          account.channel?.title ||
+          "connected YouTube channel";
+
+        ytButton.textContent =
+          "Uploading to YouTube...";
+
+        progress.textContent =
+          `Uploading to: ${channelName}`;
+
+        const yt =
+          await uploadLocalVideoToYouTube(
+            data.video.filename,
+            titleInput.value.trim() ||
+              "Untitled Video",
+            descriptionInput.value.trim()
+          );
+
+        if (yt.videoId) {
+          progress.textContent =
+            "🔒 Uploaded to YouTube as PRIVATE. Starting YouTube processing/check...";
+
+          const result =
+            await checkYouTubeVideoStatus(
+              yt.videoId,
+              progress
+            );
+
+          if (result?.action === "deleted") {
+            progress.textContent =
+              "❌ YouTube rejection detected. DhruvTube automatically deleted the private video.";
+          } else if (
+            result?.action === "published"
+          ) {
+            progress.textContent =
+              "✅ YouTube check completed. Video is now PUBLIC automatically.";
+          } else if (
+            result?.action === "still_processing"
+          ) {
+            progress.textContent =
+              "⏳ YouTube is still checking the video. It remains PRIVATE.";
+          } else if (
+            result?.privacyStatus === "public"
+          ) {
+            progress.textContent =
+              "✅ Video is now PUBLIC on YouTube.";
+          }
+        }
+
+        if (yt.url) {
+          const openLink =
+            document.createElement("a");
+
+          openLink.href = yt.url;
+          openLink.target = "_blank";
+          openLink.rel =
+            "noopener noreferrer";
+          openLink.textContent =
+            "Open on YouTube";
+
+          openLink.style.cssText = `
+            display:block;
+            margin-top:10px;
+            text-align:center;
+            font-weight:600;
+          `;
+
+          progress.parentElement.appendChild(
+            openLink
+          );
+        }
+
+        ytButton.disabled = false;
+        ytButton.textContent =
+          "🚀 YouTube: Private → Check → Public";
+
+      } catch (error) {
+        console.error(
+          "YouTube upload flow error:",
+          error
+        );
+
+        progress.textContent =
+          "❌ YouTube upload/check failed: " +
+          error.message;
+
+        ytButton.disabled = false;
+        ytButton.textContent =
+          "🚀 YouTube: Private → Check → Public";
+      }
+    };
+
     setTimeout(() => {
 
       const form =
@@ -1395,7 +1654,7 @@ async function uploadVideo() {
         );
 
       if (form) {
-        form.remove();
+//         form.remove();
       }
 
     }, 800);
@@ -1441,6 +1700,53 @@ function escapeHTML(value) {
 
 
 // ===============================
+// GOOGLE LOGIN CALLBACK
+// ===============================
+
+(function handleGoogleLoginCallback() {
+  const params = new URLSearchParams(window.location.search);
+  const encodedUser = params.get("user");
+  const googleLogin = params.get("google_login");
+
+  if (googleLogin === "success" && encodedUser) {
+    try {
+      const base64 = encodedUser
+        .replace(/-/g, "+")
+        .replace(/_/g, "/");
+
+      const padded =
+        base64 + "=".repeat((4 - base64.length % 4) % 4);
+
+      const user = JSON.parse(
+        decodeURIComponent(
+          Array.from(atob(padded))
+            .map(char =>
+              "%" + char.charCodeAt(0).toString(16).padStart(2, "0")
+            )
+            .join("")
+        )
+      );
+
+      if (user && user.id) {
+        localStorage.setItem(
+          "dhruvtube_user",
+          JSON.stringify(user)
+        );
+        currentUser = user;
+      }
+
+      window.history.replaceState(
+        {},
+        document.title,
+        window.location.pathname
+      );
+    } catch (error) {
+      console.error("Google login callback error:", error);
+    }
+  }
+})();
+
+// ===============================
 // AUTH / ACCOUNT
 // ===============================
 
@@ -1458,10 +1764,7 @@ const authRegisterForm = document.getElementById("authRegisterForm");
 const authTitle = document.getElementById("authTitle");
 
 function openAuthModal() {
-  authModal.classList.remove("hidden");
-  authLoginForm.classList.remove("hidden");
-  authRegisterForm.classList.add("hidden");
-  authTitle.textContent = "Sign in to DhruvTube";
+  window.location.href = "/api/youtube/connect";
 }
 
 function closeAuthModal() {
@@ -1482,6 +1785,7 @@ function updateAccountUI() {
     handle.textContent = "@dhruvtube";
     loginButton.classList.remove("hidden");
     loggedIn.classList.add("hidden");
+    topAvatar.style.backgroundImage = "";
     topAvatar.textContent = "D";
     return;
   }
@@ -1496,12 +1800,20 @@ function updateAccountUI() {
 
   loginButton.classList.add("hidden");
   loggedIn.classList.remove("hidden");
-  topAvatar.textContent = initial;
+  if (currentUser.avatar) {
+    topAvatar.style.backgroundImage = `url("${currentUser.avatar}")`;
+    topAvatar.style.backgroundSize = "cover";
+    topAvatar.style.backgroundPosition = "center";
+    topAvatar.textContent = "";
+  } else {
+    topAvatar.style.backgroundImage = "";
+    topAvatar.textContent = initial;
+  }
 }
 
 function saveCurrentUser(user) {
   currentUser = user;
-  localStorage.setItem("dhruvtube_user", JSON.stringify(user));
+        // login storage disabled for logout test
   updateAccountUI();
 }
 
@@ -1520,14 +1832,9 @@ function loadCurrentUser() {
   updateAccountUI();
 }
 
-profileBtn.onclick = () => {
-  const popup = document.getElementById("accountPopup");
+loadCurrentUser();
 
-  if (popup) {
-    popup.classList.toggle("hidden");
-    updateAccountPopup();
-  }
-};
+
 
 function updateAccountPopup() {
   const popupName = document.getElementById("popupName");
@@ -1545,6 +1852,7 @@ function updateAccountPopup() {
     popupAvatar.textContent = "D";
 
     signIn.classList.remove("hidden");
+    signIn.textContent = "Sign in with Google";
     viewChannel.classList.add("hidden");
     signOut.classList.add("hidden");
 
@@ -1562,7 +1870,8 @@ function updateAccountPopup() {
 
   popupAvatar.textContent = initial;
 
-  signIn.classList.add("hidden");
+  signIn.classList.remove("hidden");
+  signIn.textContent = "Switch Google account";
   viewChannel.classList.remove("hidden");
   signOut.classList.remove("hidden");
 }
@@ -1572,21 +1881,51 @@ document.getElementById("popupSignIn").onclick = () => {
   openAuthModal();
 };
 
+const accountAddBtn = document.getElementById("accountAddBtn");
+
+if (accountAddBtn) {
+  accountAddBtn.onclick = () => {
+    document.getElementById("accountPopup").classList.add("hidden");
+    openAuthModal();
+  };
+}
+
 document.getElementById("popupViewChannel").onclick = () => {
   document.getElementById("accountPopup").classList.add("hidden");
   showPage("profile");
   updateAccountUI();
 };
 
-document.getElementById("popupSignOut").onclick = () => {
+function logoutCurrentUser() {
   currentUser = null;
+
   localStorage.removeItem("dhruvtube_user");
+  sessionStorage.removeItem("dhruvtube_user");
+
+  const popup = document.getElementById("accountPopup");
+  if (popup) popup.classList.add("hidden");
 
   updateAccountUI();
   updateAccountPopup();
 
-  document.getElementById("accountPopup").classList.add("hidden");
-};
+  window.history.replaceState(
+    {},
+    document.title,
+    window.location.pathname
+  );
+
+  window.location.reload();
+}
+
+const popupSignOutButton = document.getElementById("popupSignOut");
+
+if (popupSignOutButton) {
+  popupSignOutButton.onclick = function (event) {
+    event.preventDefault();
+    event.stopPropagation();
+    logoutCurrentUser();
+  };
+}
 
 loginBtn.onclick = () => {
   openAuthModal();
@@ -1711,12 +2050,16 @@ registerSubmit.onclick = async () => {
   registerSubmit.textContent = "Create account";
 };
 
-document.getElementById("logoutBtn").onclick = () => {
-  currentUser = null;
-  localStorage.removeItem("dhruvtube_user");
-  updateAccountUI();
-  showPage("profile");
-};
+const logoutBtn = document.getElementById("logoutBtn");
+
+if (logoutBtn) {
+  logoutBtn.onclick = () => {
+    currentUser = null;
+    localStorage.removeItem("dhruvtube_user");
+    updateAccountUI();
+    showPage("profile");
+  };
+}
 
 loadCurrentUser();
 updateAccountPopup();
@@ -1745,60 +2088,123 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-/* ================================
-   DHRUVTUBE GAMING ICON ANIMATIONS
-   ================================ */
+async function uploadLocalVideoToYouTube(filename, title, description, tags = "", privacyStatus = "private", publishAt = "", thumbnailFilename = "") {
+  const statusResponse = await fetch(`${API}/youtube/status`);
+  const status = await statusResponse.json();
 
-(function initDhruvGamingAnimations() {
-  function animateElement(el, classes) {
-    if (!el) return;
-
-    classes.forEach(c => el.classList.remove(c));
-
-    void el.offsetWidth;
-
-    classes.forEach(c => el.classList.add(c));
-
-    setTimeout(() => {
-      classes.forEach(c => el.classList.remove(c));
-    }, 500);
+  if (!status.connected) {
+    throw new Error("YouTube account connected nahi hai. Pehle YouTube account connect karo.");
   }
 
-  document.addEventListener("click", (event) => {
-    const target = event.target.closest("button, .nav, .video-card, .player-rec-card");
-    if (!target) return;
-
-    if (
-      target.id === "profileBtn" ||
-      target.id === "searchOpen" ||
-      target.id === "themeBtn"
-    ) {
-      animateElement(target, ["dhruv-pop", "dhruv-glow"]);
-      return;
-    }
-
-    if (target.id === "uploadBtn") {
-      animateElement(target, ["dhruv-rotate", "dhruv-glow"]);
-      return;
-    }
-
-    if (target.classList.contains("nav")) {
-      animateElement(target, ["dhruv-pop", "dhruv-pulse"]);
-      return;
-    }
-
-    if (
-      target.closest(".like-button") ||
-      target.classList.contains("like-button")
-    ) {
-      animateElement(target, ["dhruv-pop", "dhruv-glow"]);
-      return;
-    }
-
-    if (target.classList.contains("video-card") ||
-        target.classList.contains("player-rec-card")) {
-      animateElement(target, ["dhruv-pop"]);
-    }
+  const response = await fetch(`${API}/youtube/upload`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      filename,
+      title: title || "Untitled Video",
+      description: description || "",
+      tags: tags || "",
+      privacyStatus: privacyStatus || "private",
+      publishAt: publishAt || "",
+      thumbnailFilename: thumbnailFilename || ""
+    })
   });
-})();
 
+  const data = await response.json();
+
+  if (!response.ok || !data.success) {
+    throw new Error(data.message || "YouTube upload failed.");
+  }
+
+  return data;
+}
+
+console.log("DhruvTube YouTube uploader ready");
+
+/* ===============================
+   ACCOUNT POPUP - SINGLE CLICK HANDLER
+   =============================== */
+
+document.addEventListener("click", function (event) {
+  const target = event.target;
+
+  const addBtn = target.closest("#accountAddBtn");
+  const switchBtn = target.closest("#popupSignIn");
+  const channelBtn = target.closest("#popupViewChannel");
+  const signOutBtn = target.closest("#popupSignOut");
+
+  if (addBtn || switchBtn) {
+    event.preventDefault();
+    openAuthModal();
+    return;
+  }
+
+  if (channelBtn) {
+    event.preventDefault();
+
+    const popup = document.getElementById("accountPopup");
+    if (popup) popup.classList.add("hidden");
+
+    if (typeof showPage === "function") {
+      showPage("profile");
+    }
+
+    if (typeof updateAccountUI === "function") {
+      updateAccountUI();
+    }
+
+  if (signOutBtn) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (typeof logoutCurrentUser === "function") {
+      logoutCurrentUser();
+    }
+
+    return;
+  }
+
+    return;
+  }
+
+
+});
+
+window.addEventListener("load", () => {
+  const welcome = new SpeechSynthesisUtterance("Welcome to DhruvTube");
+  welcome.rate = 0.9;
+  welcome.pitch = 1;
+  welcome.volume = 1;
+
+  setTimeout(() => {
+    speechSynthesis.cancel();
+    speechSynthesis.speak(welcome);
+  }, 500);
+});
+
+
+/* ===============================
+   DHRUVTUBE REFRESH
+================================ */
+
+const refreshBtn = document.getElementById("refreshBtn");
+
+if (refreshBtn) {
+  refreshBtn.onclick = async () => {
+    refreshBtn.disabled = true;
+    refreshBtn.style.transform = "rotate(360deg)";
+
+    try {
+      await loadVideos();
+    } catch (error) {
+      console.error("Refresh error:", error);
+    }
+
+    setTimeout(() => {
+      refreshBtn.disabled = false;
+      refreshBtn.style.transform = "";
+    }, 500);
+  };
+}

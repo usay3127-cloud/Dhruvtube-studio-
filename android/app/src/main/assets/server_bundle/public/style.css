@@ -1707,3 +1707,267 @@ body.you-mode #home {
   font-size: 13px !important;
 }
 
+
+/* ================================
+   DHRUVTUBE GAMING THEME
+   ================================ */
+
+:root {
+  --bg: #070812;
+  --text: #f4f7ff;
+  --muted: #8d94aa;
+  --line: rgba(120, 130, 180, .18);
+  --chip: #111528;
+  --card: #0d1020;
+  --neon-blue: #3b82ff;
+  --neon-purple: #8b5cf6;
+  --neon-pink: #ec4899;
+}
+
+html {
+  background: #070812;
+}
+
+body {
+  background:
+    radial-gradient(circle at 15% -10%, rgba(59,130,255,.16), transparent 35%),
+    radial-gradient(circle at 90% 10%, rgba(139,92,246,.14), transparent 32%),
+    #070812;
+  color: var(--text);
+}
+
+.topbar {
+  background: rgba(7, 8, 18, .88);
+  border-bottom: 1px solid rgba(100, 120, 255, .18);
+  box-shadow: 0 8px 30px rgba(0,0,0,.28);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.brand {
+  color: #fff;
+  text-shadow: 0 0 18px rgba(59,130,255,.55);
+}
+
+.yt-icon {
+  background: linear-gradient(135deg, #3b82ff, #8b5cf6);
+  box-shadow: 0 0 18px rgba(99,102,241,.55);
+}
+
+.top-actions button,
+.bottom-nav button {
+  transition:
+    transform .16s ease,
+    background .2s ease,
+    color .2s ease,
+    box-shadow .2s ease;
+}
+
+.top-actions button:hover,
+.bottom-nav button:hover {
+  background: rgba(99,102,241,.13);
+  box-shadow: 0 0 18px rgba(99,102,241,.18);
+}
+
+/* Cards */
+
+.video-card,
+.player-rec-card {
+  background: linear-gradient(145deg, rgba(18,22,42,.96), rgba(9,11,23,.96));
+  border: 1px solid rgba(120,130,200,.14);
+  box-shadow: 0 8px 28px rgba(0,0,0,.25);
+  transition:
+    transform .22s ease,
+    border-color .22s ease,
+    box-shadow .22s ease;
+}
+
+.video-card:hover,
+.player-rec-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(99,102,241,.55);
+  box-shadow:
+    0 12px 35px rgba(0,0,0,.4),
+    0 0 24px rgba(99,102,241,.14);
+}
+
+img {
+  border-color: rgba(120,130,200,.15);
+}
+
+/* Chips */
+
+.chip,
+.category-chip {
+  background: rgba(20,24,45,.9);
+  border: 1px solid rgba(120,130,200,.15);
+  color: #dce2f5;
+  transition: .18s ease;
+}
+
+.chip:hover,
+.category-chip:hover {
+  border-color: rgba(99,102,241,.6);
+  box-shadow: 0 0 15px rgba(99,102,241,.16);
+}
+
+/* Bottom navigation */
+
+.bottom-nav {
+  background: rgba(7,8,18,.94);
+  border-top: 1px solid rgba(100,120,255,.18);
+  box-shadow: 0 -8px 30px rgba(0,0,0,.35);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.bottom-nav button.active {
+  color: #8b9cff;
+  text-shadow: 0 0 12px rgba(99,102,241,.8);
+}
+
+/* All clickable controls */
+
+button,
+a,
+.video-card,
+.player-rec-card {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Touch animation */
+
+button:active,
+a:active,
+.video-card:active,
+.player-rec-card:active {
+  transform: scale(.94);
+  transition-duration: .08s;
+}
+
+/* Neon ripple-like press glow */
+
+button:active::after {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border-radius: inherit;
+  background: rgba(120,140,255,.12);
+  box-shadow: 0 0 22px rgba(99,102,241,.5);
+  pointer-events: none;
+  animation: dhruvPress .35s ease-out;
+}
+
+@keyframes dhruvPress {
+  0% {
+    opacity: .9;
+    transform: scale(.7);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.25);
+  }
+}
+
+/* Make circular action buttons animate nicely */
+
+.top-actions button,
+.bottom-nav button {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Modal / popup glass effect */
+
+.modal,
+.auth-modal,
+.account-popup,
+.profile-menu {
+  background: rgba(12,15,30,.96);
+  border: 1px solid rgba(120,130,255,.2);
+  box-shadow:
+    0 20px 60px rgba(0,0,0,.55),
+    0 0 30px rgba(99,102,241,.1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* Inputs */
+
+input,
+textarea,
+select {
+  background: #0d1122;
+  color: #f4f7ff;
+  border-color: rgba(120,130,200,.22);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99,102,241,.12);
+}
+
+/* Scrollbar */
+
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: #070812;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(#3b82ff, #8b5cf6);
+  border-radius: 10px;
+}
+
+/* Smooth page feel */
+
+* {
+  scroll-behavior: smooth;
+}
+
+
+/* ================================
+   DHRUVTUBE ICON ANIMATIONS
+   ================================ */
+
+@keyframes dhruvIconPop {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(1.28); }
+  65%  { transform: scale(.9); }
+  100% { transform: scale(1); }
+}
+
+@keyframes dhruvIconPulse {
+  0%   { box-shadow: 0 0 0 0 rgba(99,102,241,.65); }
+  100% { box-shadow: 0 0 0 16px rgba(99,102,241,0); }
+}
+
+@keyframes dhruvIconRotate {
+  0%   { transform: rotate(0deg) scale(1); }
+  45%  { transform: rotate(18deg) scale(1.18); }
+  100% { transform: rotate(0deg) scale(1); }
+}
+
+.dhruv-pop {
+  animation: dhruvIconPop .38s cubic-bezier(.2,.8,.2,1);
+}
+
+.dhruv-pulse {
+  animation: dhruvIconPulse .45s ease-out;
+}
+
+.dhruv-rotate {
+  animation: dhruvIconRotate .42s cubic-bezier(.2,.8,.2,1);
+}
+
+.dhruv-glow {
+  filter: drop-shadow(0 0 9px rgba(99,102,241,.9));
+}
+
