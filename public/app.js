@@ -776,37 +776,20 @@ $("editorDeleteBtn")?.addEventListener("click", async () => {
 
 
 /* =========================
-   AUTH / ACCOUNT
+   GOOGLE AUTH / ACCOUNT
 ========================= */
 
-let authRegisterMode = false;
-
-function openAuth(mode = false) {
-  authRegisterMode = mode;
-
+function openAuth() {
   const modal = $("authModal");
-  const title = $("authTitle");
-  const username = $("authUsername");
-  const submit = $("authSubmit");
-  const switchBtn = $("authSwitch");
   const message = $("authMessage");
 
   if (!modal) return;
 
   modal.classList.remove("hidden");
 
-  if (message) message.textContent = "";
-
-  if (authRegisterMode) {
-    if (title) title.textContent = "Create your DhruvTube account";
-    if (username) username.classList.remove("hidden");
-    if (submit) submit.textContent = "Create account";
-    if (switchBtn) switchBtn.textContent = "Already have an account? Sign in";
-  } else {
-    if (title) title.textContent = "Sign in to DhruvTube";
-    if (username) username.classList.add("hidden");
-    if (submit) submit.textContent = "Sign in";
-    if (switchBtn) switchBtn.textContent = "Create an account";
+  if (message) {
+    message.textContent =
+      "Connect your Google account and YouTube channel.";
   }
 }
 
@@ -814,80 +797,26 @@ function closeAuth() {
   $("authModal")?.classList.add("hidden");
 }
 
-async function submitAuth() {
-  const email = $("authEmail")?.value.trim();
-  const password = $("authPassword")?.value || "";
-  const username = $("authUsername")?.value.trim();
-  const message = $("authMessage");
-  const submit = $("authSubmit");
 
-  if (!email || !password) {
-    if (message) message.textContent = "Enter email and password.";
-    return;
+/* =========================
+   GOOGLE LOGIN
+========================= */
+
+$("googleLoginBtn")?.addEventListener("click", () => {
+  const button = $("googleLoginBtn");
+
+  if (button) {
+    button.disabled = true;
+    button.textContent = "Connecting...";
   }
 
-  if (authRegisterMode && !username) {
-    if (message) message.textContent = "Enter a username.";
-    return;
-  }
+  window.location.href = "/api/youtube/connect";
+});
 
-  if (submit) submit.disabled = true;
-  if (message) message.textContent = "";
 
-  try {
-    const endpoint = authRegisterMode
-      ? `${API}/auth/register`
-      : `${API}/auth/login`;
-
-    const body = authRegisterMode
-      ? { username, email, password }
-      : { email, password };
-
-    const response = await fetch(endpoint, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(body)
-    });
-
-    const data = await response.json().catch(() => ({}));
-
-    if (!response.ok || !data.success) {
-      throw new Error(
-        data.message || data.error || "Authentication failed."
-      );
-    }
-
-    if (data.user) {
-      localStorage.setItem(
-        "currentUser",
-        JSON.stringify(data.user)
-      );
-
-      localStorage.setItem(
-        "dhruvtubeUser",
-        JSON.stringify(data.user)
-      );
-    }
-
-    closeAuth();
-
-    updateChannelUI(data.user);
-
-    allVideos = await fetchVideos();
-    updateDashboardStats(allVideos);
-    renderRecentVideos(allVideos);
-    renderContentVideos(allVideos);
-
-  } catch (error) {
-    if (message) {
-      message.textContent = error.message;
-    }
-  } finally {
-    if (submit) submit.disabled = false;
-  }
-}
+/* =========================
+   PROFILE BUTTON
+========================= */
 
 $("profileBtn")?.addEventListener("click", () => {
   const user = loadSavedUser();
@@ -896,21 +825,93 @@ $("profileBtn")?.addEventListener("click", () => {
     showStudioPage("dashboard");
     updateChannelUI(user);
   } else {
-    openAuth(false);
+    openAuth();
   }
 });
 
-$("closeAuth")?.addEventListener("click", closeAuth);
 
-$("authModal")?.addEventListener("click", (event) => {
-  if (event.target.classList.contains("modal-backdrop")) {
-    closeAuth();
+/* =========================
+   CLOSE AUTH
+========================= */
+
+$("closeAuth")?.addEventListener(
+  "click",
+  closeAuth
+);
+
+$("authModal")?.addEventListener(
+  "click",
+  (event) => {
+    if (
+      event.target.classList.contains(
+        "modal-backdrop"
+      )
+    ) {
+      closeAuth();
+    }
   }
-});
+);
 
-$("authSwitch")?.addEventListener("click", () => {
-  openAuth(!authRegisterMode);
-});
 
-$("authSubmit")?.addEventListener("click", submitAuth);
+/* =========================
+   GOOGLE LOGIN CALLBACK
+========================= */
 
+function handleGoogleLoginCallback() {
+  const params =
+    new URLSearchParams(
+      window.location.search
+    );
+
+  if (
+    params.get("google_login") !==
+    "success"
+  ) {
+    return;
+  }
+
+  const encodedUser =
+    params.get("user");
+
+  if (encodedUser) {
+    try {
+      const user =
+        JSON.parse(
+          decodeURIComponent(
+            encodedUser
+          )
+        );
+
+      localStorage.setItem(
+        "currentUser",
+        JSON.stringify(user)
+      );
+
+      localStorage.setItem(
+        "dhruvtubeUser",
+        JSON.stringify(user)
+      );
+
+      localStorage.setItem(
+        "dhruvtube_google_user",
+        JSON.stringify(user)
+      );
+
+      updateChannelUI(user);
+
+    } catch (error) {
+      console.error(
+        "Google login user error:",
+        error
+      );
+    }
+  }
+
+  window.history.replaceState(
+    {},
+    document.title,
+    window.location.pathname
+  );
+}
+
+handleGoogleLoginCallback();
